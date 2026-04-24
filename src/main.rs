@@ -1,18 +1,21 @@
+use clap::Parser;
 use color_eyre::eyre::{OptionExt, bail};
 use nt_hive::{Hive, KeyValueData};
-use std::{env, fs::File, io::Read};
+use std::{fs::File, io::Read, path::PathBuf};
 use uuid::Uuid;
 
+#[derive(Parser)]
+struct Args {
+    /// Where the Windows partition is mounted (e.g. /mnt/windows)
+    mountpoint: PathBuf,
+}
+
 fn main() -> color_eyre::Result<()> {
-    let Some(filename) = env::args().nth(1) else {
-        println!("Usage: readhive <FILENAME>");
-        return Ok(());
-    };
-    println!();
+    let Args { mountpoint } = Args::parse();
 
+    let hive_file = mountpoint.join("Windows/System32/config/SYSTEM");
     let mut buf = Vec::new();
-    File::open(filename)?.read_to_end(&mut buf)?;
-
+    File::open(hive_file)?.read_to_end(&mut buf)?;
     let hive = Hive::new(buf.as_ref())?;
 
     let root_key = hive.root_key_node()?;
@@ -38,7 +41,11 @@ fn main() -> color_eyre::Result<()> {
             bail!("Expected small data");
         };
         let link_key = Uuid::from_slice(link_key_bytes)?;
-        println!("{}: {:X}", name, link_key.simple());
+        println!(
+            "{}: {:X}",
+            name.to_string().to_uppercase(),
+            link_key.simple()
+        );
     }
 
     Ok(())
