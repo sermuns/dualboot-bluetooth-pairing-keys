@@ -1,7 +1,7 @@
 use clap::Parser;
 use color_eyre::eyre::{Context, OptionExt, bail};
 use nt_hive::{Hive, KeyValueData};
-use std::{fs::File, io::Read, path::PathBuf, str::FromStr};
+use std::{fs::File, io::Read, path::PathBuf};
 use uuid::Uuid;
 
 #[derive(Parser)]
@@ -39,12 +39,15 @@ fn main() -> color_eyre::Result<()> {
             .filter_map(|v| v.ok())
             .flatten()
             .filter_map(|v| v.ok())
+            .filter(|v| v.name().is_ok_and(|n| n != "CentralIrk"))
             .collect();
 
+        let num_adapters = adapter_values.len();
         println!(
-            "[ Adapter {} has {} devices ]",
+            "Adapter with ID {} has {} device{}:",
             adapter_name_string.to_uppercase(),
-            adapter_values.len(),
+            num_adapters,
+            if num_adapters == 1 { "" } else { "s" }
         );
 
         for device_key in adapter_values {
@@ -54,7 +57,7 @@ fn main() -> color_eyre::Result<()> {
             };
             let link_key = Uuid::from_slice(link_key_bytes)?;
             println!(
-                "  - {}: {:X}",
+                "- ID: {}, Link key: {:X}",
                 device_id.to_string().to_uppercase(),
                 link_key.simple()
             );
