@@ -1,5 +1,6 @@
 [package]
 name = "dualboot-bt-link-keys"
+description = "Copy Bluetooth link keys from Windows to Linux"
 version = "0.1.0"
 edition = "2024"
 

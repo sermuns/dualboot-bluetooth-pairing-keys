@@ -5,6 +5,7 @@ use std::{fs::File, io::Read, path::PathBuf};
 use uuid::Uuid;
 
 #[derive(Parser)]
+#[command(version, about, arg_required_else_help = true)]
 struct Args {
     /// Where the Windows partition is mounted (e.g. /mnt/windows)
     mountpoint: PathBuf,
