@@ -45,7 +45,9 @@ fn main() -> color_eyre::Result<()> {
 
     for adapter in adapters_key.subkeys().ok_or_eyre("No adapters")?? {
         let adapter = adapter?;
-        let adapter_name_string = adapter.name()?.to_string();
+
+        let adapter_name_with_colons = hex_string_with_colons(&adapter.name()?.to_string());
+
         let adapter_values: Vec<_> = adapter
             .values()
             .into_iter()
@@ -58,24 +60,39 @@ fn main() -> color_eyre::Result<()> {
         let num_devices = adapter_values.len();
         println!(
             "Adapter with ID {} has {} device{}:",
-            adapter_name_string.to_uppercase(),
+            adapter_name_with_colons,
             num_devices,
             if num_devices == 1 { "" } else { "s" }
         );
 
         for device_key in adapter_values {
-            let device_id = device_key.name()?;
+            let device_name_with_colons = hex_string_with_colons(&device_key.name()?.to_string());
             let KeyValueData::Small(link_key_bytes) = device_key.data()? else {
                 bail!("Expected small data");
             };
             let link_key = Uuid::from_slice(link_key_bytes)?;
             println!(
-                "- ID: {}, Link key: {:X}",
-                device_id.to_string().to_uppercase(),
+                "- {} has link key {:X}",
+                device_name_with_colons,
                 link_key.simple()
             );
         }
     }
 
     Ok(())
+}
+
+fn hex_string_with_colons(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + s.len() / 2 - 1);
+
+    for (i, chunk) in s.as_bytes().chunks(2).enumerate() {
+        if i > 0 {
+            out.push(':');
+        }
+        for &b in chunk {
+            out.push((b as char).to_ascii_uppercase());
+        }
+    }
+
+    out
 }
