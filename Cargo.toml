@@ -1,5 +1,5 @@
 [package]
-name = "dualboot-bluetooth-pairing-keys"
+name = "dualboot-bt-link-keys"
 version = "0.1.0"
 edition = "2024"
 

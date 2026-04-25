@@ -1,4 +1,4 @@
-# `dualboot-bluetooth-pairing-keys`
+# `dualboot-bt-link-keys`
 
 Pure-Rust, self-contained program to export Bluetooth link keys from Windows partitions when booted in Linux.
 
