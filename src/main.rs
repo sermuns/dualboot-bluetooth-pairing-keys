@@ -55,12 +55,12 @@ fn main() -> color_eyre::Result<()> {
             .filter(|v| v.name().is_ok_and(|n| n != "CentralIrk"))
             .collect();
 
-        let num_adapters = adapter_values.len();
+        let num_devices = adapter_values.len();
         println!(
             "Adapter with ID {} has {} device{}:",
             adapter_name_string.to_uppercase(),
-            num_adapters,
-            if num_adapters == 1 { "" } else { "s" }
+            num_devices,
+            if num_devices == 1 { "" } else { "s" }
         );
 
         for device_key in adapter_values {
