@@ -1,5 +1,8 @@
 use clap::Parser;
-use color_eyre::eyre::{Context, OptionExt, bail};
+use color_eyre::{
+    Section,
+    eyre::{Context, OptionExt, bail, ensure, eyre},
+};
 use nt_hive::{Hive, KeyValueData};
 use std::{fs::File, io::Read, path::PathBuf};
 use uuid::Uuid;
@@ -14,11 +17,20 @@ struct Args {
 fn main() -> color_eyre::Result<()> {
     color_eyre::config::HookBuilder::default()
         .display_env_section(false)
+        .display_location_section(false)
         .install()?;
 
     let Args { mountpoint } = Args::parse();
 
-    let hive_path = mountpoint.join("Windows/System32/config/SYSTEM");
+    let windows_dir_path = mountpoint.join("Windows");
+    ensure!(
+        windows_dir_path.exists(),
+        eyre!("Given mountpoint does not contain a 'Windows' directory").suggestion(format!(
+            "Ensure you mounted the correct Windows partition at given path '{}'",
+            mountpoint.display()
+        ))
+    );
+    let hive_path = windows_dir_path.join("System32/config/SYSTEM");
     let mut buf = Vec::new();
     File::open(&hive_path)
         .with_context(|| format!("Failed to open hive file at '{}'", hive_path.display()))?
