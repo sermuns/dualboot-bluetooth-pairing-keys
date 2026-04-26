@@ -34,46 +34,45 @@ cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
 >
 > **First boot into Windows and pair the device(s) you want**, then boot to Linux and follow the instructions below.
 
-1. Find the name of Windows partition
+1. Find the name of your Windows partition.
 
-   > [!TIP]
-   > Search for a partition with NTFS filesystem by:
-   >
-   > ```sh
-   > lsblk --list --output NAME,FSTYPE,SIZE | grep ntfs
-   > ```
-   >
-   > If there are many, probably you want the one with the biggest size
+   For example:
 
-2. Mount the Windows partition in read-only mode
+   ```sh
+   lsblk --list --output NAME,FSTYPE,SIZE | grep ntfs
+   ```
+
+   (If there are many NTFS partitions, maybe you want the one with the biggest size?)
+
+2. Mount the Windows partition in read-only mode:
 
    ```sh
    mount --mkdir -o ro /dev/<PARTITION NAME> <MOUNTPOINT>
    ```
 
-3. Run the program with superuser privileges
+3. Run the program with superuser privileges:
 
    ```sh
    dualboot-bt-link-keys <MOUNTPOINT> --write --restart-bluetooth
    ```
 
-   > [!NOTE]
-   > You can also omit the flags `--write` and `--restart-bluetooth` and run as normal user.
-   >
-   > Just manually create/edit the file(s) at `/var/lib/bluetooth/<ADAPTER ADDRESS>/<DEVICE ADDRESS>/info` and add/edit the lines
-   >
-   > ```ini
-   > [LinkKey]
-   > Key=<LINK KEY>
-   > ```
-   >
-   > Then restart bluetooth with
-   >
-   > ```sh
-   > systemctl restart bluetooth
-   > ```
+> [!NOTE]
+> You can also omit the flags `--write` and `--restart-bluetooth` and run as normal user.
+>
+> Just manually create/edit the file(s) at `/var/lib/bluetooth/<ADAPTER ADDRESS>/<DEVICE ADDRESS>/info` and add/edit the lines
+>
+> ```ini
+> [LinkKey]
+> Key=<LINK KEY>
+> ```
+>
+> Then restart bluetooth with
+>
+> ```sh
+> systemctl restart bluetooth
+> ```
 
-4. Unmount the Windows partition
+4. Unmount the Windows partition:
 
    ```sh
    umount <MOUNTPOINT>
