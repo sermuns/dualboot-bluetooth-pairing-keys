@@ -29,6 +29,11 @@ cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
 
 ## Usage
 
+> [!IMPORTANT]
+> We are going to copy the link keys from Windows to Linux!
+>
+> **First boot into Windows and pair the device(s) you want**, then boot to Linux and follow the instructions below.
+
 1. Find the name of Windows partition
 
    > [!TIP]
@@ -46,19 +51,35 @@ cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
    mount --mkdir -o ro /dev/<PARTITION NAME> <MOUNTPOINT>
    ```
 
-3. Run the program
+3. Run the program with superuser privileges
 
    ```sh
    dualboot-bt-link-keys <MOUNTPOINT> --write --restart-bluetooth
    ```
 
-4. It should have written link keys to correct location, try connecting!
+   > [!NOTE]
+   > You can also omit the flags `--write` and `--restart-bluetooth` and run as normal user.
+   >
+   > Just manually create/edit the file(s) at `/var/lib/bluetooth/<ADAPTER ADDRESS>/<DEVICE ADDRESS>/info` and add/edit the lines
+   >
+   > ```ini
+   > [LinkKey]
+   > Key=<LINK KEY>
+   > ```
+   >
+   > Then restart bluetooth with
+   >
+   > ```sh
+   > systemctl restart bluetooth
+   > ```
 
-5. Unmount the Windows partition
+4. Unmount the Windows partition
 
    ```sh
    umount <MOUNTPOINT>
    ```
+
+5. You are done!
 
 ## Disclaimer
 
