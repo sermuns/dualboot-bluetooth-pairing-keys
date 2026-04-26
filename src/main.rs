@@ -4,7 +4,12 @@ use color_eyre::{
     eyre::{Context, OptionExt, bail, ensure, eyre},
 };
 use nt_hive::{Hive, KeyValueData};
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{
+    fs::{self, File},
+    io::{self, Read},
+    path::{Path, PathBuf},
+    process::Command,
+};
 use uuid::Uuid;
 
 #[derive(Parser)]
@@ -12,6 +17,15 @@ use uuid::Uuid;
 struct Args {
     /// Where the Windows partition is mounted (e.g. /mnt/windows)
     mountpoint: PathBuf,
+
+    /// Attempt to write link keys to /var/lib/bluetooth/..
+    #[arg(short, long)]
+    write: bool,
+
+    /// Attempt to restart systemd unit `bluetooth` after writing
+    /// Only valid if `--write` is also set!
+    #[arg(short, long, requires = "write")]
+    restart_bluetooth: bool,
 }
 
 fn main() -> color_eyre::Result<()> {
@@ -20,7 +34,11 @@ fn main() -> color_eyre::Result<()> {
         .display_location_section(false)
         .install()?;
 
-    let Args { mountpoint } = Args::parse();
+    let Args {
+        mountpoint,
+        write,
+        restart_bluetooth,
+    } = Args::parse();
 
     let windows_dir_path = mountpoint.join("Windows");
     ensure!(
@@ -46,7 +64,7 @@ fn main() -> color_eyre::Result<()> {
     for adapter in adapters_key.subkeys().ok_or_eyre("No adapters")?? {
         let adapter = adapter?;
 
-        let adapter_name_with_colons = hex_string_with_colons(&adapter.name()?.to_string());
+        let adapter_name_with_colons = create_hex_string_with_colons(&adapter.name()?.to_string());
 
         let adapter_values: Vec<_> = adapter
             .values()
@@ -60,13 +78,14 @@ fn main() -> color_eyre::Result<()> {
         let num_devices = adapter_values.len();
         println!(
             "Adapter with ID {} has {} device{}:",
-            adapter_name_with_colons,
+            &adapter_name_with_colons,
             num_devices,
             if num_devices == 1 { "" } else { "s" }
         );
 
         for device_key in adapter_values {
-            let device_name_with_colons = hex_string_with_colons(&device_key.name()?.to_string());
+            let device_name_with_colons =
+                create_hex_string_with_colons(&device_key.name()?.to_string());
             let KeyValueData::Small(link_key_bytes) = device_key.data()? else {
                 bail!("Expected small data");
             };
@@ -76,13 +95,94 @@ fn main() -> color_eyre::Result<()> {
                 device_name_with_colons,
                 link_key.simple()
             );
+
+            if !write {
+                continue;
+            }
+
+            let adapter_dir = Path::new("/var/lib/bluetooth/").join(&adapter_name_with_colons);
+            if let Err(e) = fs::create_dir(&adapter_dir)
+                && e.kind() != io::ErrorKind::AlreadyExists
+            {
+                return Err(eyre!(e)
+                    .wrap_err(format!("Failed to create '{}'", adapter_dir.display()))
+                    .suggestion("Ensure you ran the program as superuser"));
+            }
+
+            let device_dir = adapter_dir.join(&device_name_with_colons);
+            if let Err(e) = fs::create_dir(&device_dir)
+                && e.kind() != io::ErrorKind::AlreadyExists
+            {
+                return Err(eyre!(e)
+                    .wrap_err(format!("Failed to create '{}'", device_dir.display()))
+                    .suggestion("Ensure you ran the program as superuser"));
+            }
+
+            let device_info_path = device_dir.join("info");
+
+            let device_info_contents = match fs::read_to_string(&device_info_path) {
+                Ok(contents) => {
+                    let mut found = false;
+                    // FIXME: shitty alloc
+                    let mut lines: Vec<_> = contents
+                        .lines()
+                        .map(|line| {
+                            if !found && line.starts_with("Key=") {
+                                found = true;
+                                format!("Key={:X}", link_key.simple())
+                            } else {
+                                line.to_string()
+                            }
+                        })
+                        .collect();
+
+                    if !found {
+                        lines.push(format!("[LinkKey]\nKey={:X}", link_key.simple()));
+                    }
+
+                    lines.join("\n")
+                }
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                    format!("[LinkKey]\nKey={:X}\n", link_key.simple())
+                }
+                Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
+                    return Err(eyre!(e)
+                        .wrap_err(format!(
+                            "Failed to read device info file for '{}'",
+                            device_name_with_colons
+                        ))
+                        .suggestion("Ensure you ran the program as superuser"));
+                }
+
+                Err(e) => {
+                    return Err(eyre!(e).wrap_err(format!(
+                        "Failed to read device info file for '{}'",
+                        device_name_with_colons
+                    )));
+                }
+            };
+
+            fs::write(&device_info_path, device_info_contents).with_context(|| {
+                format!(
+                    "Failed to write device info file for '{}'",
+                    device_name_with_colons
+                )
+            })?;
         }
+    }
+
+    if restart_bluetooth {
+        println!("\nSuccessfully wrote link keys to /var/lib/bluetooth/");
+        Command::new("systemctl")
+            .args(["restart", "bluetooth"])
+            .status()?;
+        println!("\nRestarted systemd unit 'bluetooth'");
     }
 
     Ok(())
 }
 
-fn hex_string_with_colons(s: &str) -> String {
+fn create_hex_string_with_colons(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + s.len() / 2 - 1);
 
     for (i, chunk) in s.as_bytes().chunks(2).enumerate() {
