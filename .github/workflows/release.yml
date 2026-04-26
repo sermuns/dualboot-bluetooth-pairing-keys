@@ -1,0 +1,52 @@
+# Based on https://github.com/tommilligan/mdbook-admonish/blob/main/.github/workflows/deploy.yml
+
+name: Release
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - run: cargo build --release --target x86_64-unknown-linux-musl
+
+      - run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "CRATE_NAME=$(basename $PWD)" >> $GITHUB_ENV
+
+      - run: |
+          mkdir target/stage
+          cd target/release
+          tar czvf ../../stage/${{ env.CRATE_NAME }}-${{ steps.extract_tag.outputs.tag }}-${{ matrix.name }} ${{ env.CRATE_NAME }}
+      - name: Post Setup | Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.CRATE_NAME }}-${{ steps.extract_tag.outputs.tag }}-${{ matrix.name }}
+          path: target/stage/*
+          overwrite: true
+
+      # fuck me in the ass
+      - run: |
+          echo "RELEASE_BODY=$(sed -n '/^## \[${{ env.RELEASE_VERSION }}\].*$/,/^## /p' CHANGELOG.md | sed '$d')" >> $GITHUB_OUTPUT
+
+      - name: Upload the binary releases
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: target/stage/*
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+          release_name: v${{ env.RELEASE_VERSION }}
+          body: |
+            ${{ steps.release-notes.outputs.RELEASE_BODY }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}

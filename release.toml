@@ -1,0 +1,5 @@
+publish = false
+push = false
+tag = false
+
+pre-release-commit-message = "chore: release v{{version}}"
