@@ -17,6 +17,14 @@ The advantage of this tool over others is twofold:
 - [bt-keys-sync](https://github.com/KeyofBlueS/bt-keys-sync)
 - [bluetooth-dualboot](https://github.com/nbanks/bluetooth-dualboot)
 
+## Installation
+
+Not published yet. For now:
+
+```sh
+cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
+```
+
 ## Usage
 
 1. Find your Windows partition
