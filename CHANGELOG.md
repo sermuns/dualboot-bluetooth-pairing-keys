@@ -1,6 +1,15 @@
 # Changelog
 
-## [0.1.0](https://github.com/sermuns/dualboot-bt-link-keys/compare/v0.1.0..0.1.0) - 2026-04-26
+## [0.1.1](https://github.com/sermuns/dualboot-bt-link-keys/compare/v0.1.0..0.1.1) - 2026-04-26
+
+### 📚 Documentation
+
+- update install instructions by @sermuns in [10ca955](https://github.com/sermuns/dualboot-bt-link-keys/commit/10ca955849aa045c97abe3230cb282c90e1ce978)
+
+### ⚙️ Miscellaneous Tasks
+
+- add repository metadata by @sermuns in [81d6c3b](https://github.com/sermuns/dualboot-bt-link-keys/commit/81d6c3b5d566d317a2d35b21d9ed2eab85eeacfc)
+## [v0.1.0] - 2026-04-26
 
 ### 🚀 Features
 
