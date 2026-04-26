@@ -10,8 +10,8 @@ This problem is explained in https://wiki.archlinux.org/title/Bluetooth#Dual_boo
 
 The advantage of this tool over others is twofold:
 
-- it doesn't rely on `chntpw`
-- it only needs a read-only mount of the Windows partition (which `chntpw` doesn't support anymore)
+- it doesn't rely on `chntpw`[^1]
+- it only needs a read-only mount of the Windows partition (which `chntpw` itself and projects using it listed below, need!)
 
 **Similar projects:**
 
@@ -91,3 +91,9 @@ This code is 100% certified human-slop. **No artificial intelligence was used in
   <img alt="brainmade" src="https://brainmade.org/white-logo.svg">
 </picture>
 </a>
+
+<br>
+<br>
+<br>
+
+[^1]: https://pogostick.net/~pnh/ntpasswd/
