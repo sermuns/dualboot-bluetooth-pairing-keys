@@ -17,21 +17,24 @@ and this problem is explained in https://wiki.archlinux.org/title/Bluetooth#Dual
 ## Usage
 
 1. Find your Windows partition
+
    > [!TIP]
    > Search for a partition with NTFS filesystem by:
    >
    > ```sh
-   > lsblk --list --fs | grep ntfs
+   > lsblk --list --output NAME,FSTYPE | grep ntfs
    > ```
 
 2. Mount the Windows partition in read-only mode
+
    ```sh
-   mount --mkdir -o ro <YOUR PARTITION HERE> /mnt/windows
+   mount --mkdir -o ro <YOUR PARTITION HERE> <DESIRED MOUNTPOINT>
    ```
 
 3. Run the program
+
    ```sh
-   dualboot-bt-link-keys /mnt/windows
+   dualboot-bt-link-keys <DESIRED MOUNTPOINT> --write --restart-bluetooth
    ```
 
-
+4. It should have written link keys to correct location, try connecting!
