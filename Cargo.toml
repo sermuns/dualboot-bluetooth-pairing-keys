@@ -3,6 +3,7 @@ name = "dualboot-bt-link-keys"
 description = "Copy Bluetooth link keys from Windows to Linux"
 version = "0.1.0"
 edition = "2024"
+license = "GPL-3.0-or-later"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
