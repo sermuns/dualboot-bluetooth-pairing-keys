@@ -29,29 +29,36 @@ cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
 
 ## Usage
 
-1. Find your Windows partition
+1. Find the name of Windows partition
 
    > [!TIP]
    > Search for a partition with NTFS filesystem by:
    >
    > ```sh
-   > lsblk --list --output NAME,FSTYPE | grep ntfs
+   > lsblk --list --output NAME,FSTYPE,SIZE | grep ntfs
    > ```
+   >
+   > If there are many, probably you want the one with the biggest size
 
 2. Mount the Windows partition in read-only mode
 
    ```sh
-   mount --mkdir -o ro <YOUR PARTITION HERE> <DESIRED MOUNTPOINT>
+   mount --mkdir -o ro /dev/<PARTITION NAME> <MOUNTPOINT>
    ```
 
 3. Run the program
 
    ```sh
-   dualboot-bt-link-keys <DESIRED MOUNTPOINT> --write --restart-bluetooth
+   dualboot-bt-link-keys <MOUNTPOINT> --write --restart-bluetooth
    ```
 
 4. It should have written link keys to correct location, try connecting!
 
+5. Unmount the Windows partition
+
+   ```sh
+   umount <MOUNTPOINT>
+   ```
 
 ## Disclaimer
 

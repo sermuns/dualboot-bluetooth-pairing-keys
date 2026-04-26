@@ -16,4 +16,9 @@ Sleep 2s
 Type@1ms "sudo dualboot-bt-link-keys /mnt/windows --write --restart-bluetooth"
 Sleep 500ms
 Enter
+Sleep 2s
+
+Type "sudo umount /mnt/windows"
+Sleep 500ms
+Enter
 Sleep 5s
