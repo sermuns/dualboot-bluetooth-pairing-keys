@@ -21,11 +21,19 @@ The advantage of this tool over others is twofold:
 
 ## Installation
 
-Not published yet. For now:
+From source via
 
 ```sh
-cargo install --git https://github.com/sermuns/dualboot-bt-link-keys
+cargo install dualboot-bt-link-keys
 ```
+
+or prebuilt binaries  from
+
+1. [GitHub releases](https://github.com/sermuns/dualboot-bt-link-keys/releases/latest)
+
+2. ``sh
+   cargo binstall dualboot-bt-link-keys
+   ```
 
 ## Usage
 
