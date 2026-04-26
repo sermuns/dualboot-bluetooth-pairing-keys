@@ -1,5 +1,7 @@
 # `dualboot-bt-link-keys`
 
+![demo](media/demo.gif)
+
 Self-contained tool to copy Bluetooth link keys from Windows partitions into your Linux environment.
 
 This problem is explained in https://wiki.archlinux.org/title/Bluetooth#Dual_boot_pairing.
