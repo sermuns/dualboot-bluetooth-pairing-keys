@@ -1,18 +1,21 @@
 # `dualboot-bt-link-keys`
 
-Pure-Rust, self-contained program to export Bluetooth link keys from Windows partitions when booted in Linux.
+Self-contained tool to copy Bluetooth link keys from Windows partitions into your Linux environment.
+
+This problem is explained in https://wiki.archlinux.org/title/Bluetooth#Dual_boot_pairing.
 
 ## Why use this over X
 
-The advantage of this is that it doesn't rely on `chntpw`, which nowadays requires a writeable mount of the Windows partition. This tool only needs a read-only mount!
+The advantage of this tool over others is twofold:
+
+- it doesn't rely on `chntpw`
+- it only needs a read-only mount of the Windows partition (which `chntpw` doesn't support anymore)
 
 **Similar projects:**
 
 - [bt-dualboot](https://github.com/x2es/bt-dualboot)
 - [bt-keys-sync](https://github.com/KeyofBlueS/bt-keys-sync)
 - [bluetooth-dualboot](https://github.com/nbanks/bluetooth-dualboot)
-
-and this problem is explained in https://wiki.archlinux.org/title/Bluetooth#Dual_boot_pairing.
 
 ## Usage
 
