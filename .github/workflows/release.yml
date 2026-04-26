@@ -10,15 +10,18 @@ jobs:
   release:
     name: Create GitHub release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # for publishing release
     steps:
       - uses: actions/checkout@v6
         with:
           lfs: true
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
 
-      - name: Cache Cargo dependencies
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
 
       - run: cargo build --release --target x86_64-unknown-linux-musl
 
@@ -28,18 +31,8 @@ jobs:
 
       - run: |
           mkdir target/stage
-          cd target/release
-          tar czvf ../../stage/${{ env.CRATE_NAME }}-${{ steps.extract_tag.outputs.tag }}-${{ matrix.name }} ${{ env.CRATE_NAME }}
-      - name: Post Setup | Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.CRATE_NAME }}-${{ steps.extract_tag.outputs.tag }}-${{ matrix.name }}
-          path: target/stage/*
-          overwrite: true
-
-      # fuck me in the ass
-      - run: |
-          echo "RELEASE_BODY=$(sed -n '/^## \[${{ env.RELEASE_VERSION }}\].*$/,/^## /p' CHANGELOG.md | sed '$d')" >> $GITHUB_OUTPUT
+          cd target/x86_64-unknown-linux-musl/release
+          tar czvf ../../stage/${{ env.CRATE_NAME }}-${{ env.RELEASE_VERSION }}.tar.gz ${{ env.CRATE_NAME }}
 
       - name: Upload the binary releases
         uses: svenstaro/upload-release-action@v2
@@ -49,8 +42,6 @@ jobs:
           overwrite: true
           tag: ${{ github.ref }}
           release_name: v${{ env.RELEASE_VERSION }}
-          body: |
-            ${{ steps.release-notes.outputs.RELEASE_BODY }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   publish-crates-io:

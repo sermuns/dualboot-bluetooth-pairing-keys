@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - 2026-04-26
+## [0.1.0](https://github.com/sermuns/dualboot-bt-link-keys/compare/v0.1.0..0.1.0) - 2026-04-26
 
 ### 🚀 Features
 
@@ -40,5 +40,5 @@
 - add description, require arg otherwise help by @sermuns in [2ba050d](https://github.com/sermuns/dualboot-bt-link-keys/commit/2ba050d13a925c454c2a07edcf9a68711d195c66)
 - fix typo by @sermuns in [cdaf118](https://github.com/sermuns/dualboot-bt-link-keys/commit/cdaf118202824d4f9ee7597fdccd487c8a6a23a5)
 - add license by @sermuns in [2d8b7d4](https://github.com/sermuns/dualboot-bt-link-keys/commit/2d8b7d476a0ad787a05419967f0d52d42f4d4c71)
-- add release workflows and shi, prepare for publishing to crates.io by Samuel Åkesson in [213ff0b](https://github.com/sermuns/dualboot-bt-link-keys/commit/213ff0bd6f2d1a5604ae60d25947b41e5ff50c25)
-- add cargo publish workflow by Samuel Åkesson in [611c3a5](https://github.com/sermuns/dualboot-bt-link-keys/commit/611c3a5d0b1bb799cafa4fd4c41bc5c3d44322f9)
+- add release workflows and shi, prepare for publishing to crates.io by @sermuns in [213ff0b](https://github.com/sermuns/dualboot-bt-link-keys/commit/213ff0bd6f2d1a5604ae60d25947b41e5ff50c25)
+- add cargo publish workflow by @sermuns in [e23e068](https://github.com/sermuns/dualboot-bt-link-keys/commit/e23e068057c0d53912e6e07c043f08af27663506)
